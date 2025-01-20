@@ -1,25 +1,50 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// App.tsx
+import React, { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import CityDetailsPage from "./pages/CityDetailsPage";
+import Header from "./components/Header";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { UnitTypes } from "./types";
 
 function App() {
+  const [unit, setUnit] = useState<UnitTypes>("metric");
+  const [cities, setCities] = useState<string[]>([
+    "London",
+    "New York",
+    "Tokyo",
+    "Delhi",
+  ]);
+
+  const onRemove = (name: string) => {
+    setCities((prevCities) => prevCities.filter((city) => city !== name));
+  };
+
+  const toggleUnit = () => {
+    setUnit((prevUnit) => (prevUnit === "metric" ? "imperial" : "metric"));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <ToastContainer limit={1} />
+      <Header unit={unit} setUnit={toggleUnit} setCities={setCities} />
+      <div className="pt-24 max-w-screen-md mx-auto">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Dashboard
+                cities={cities}
+                unit={unit}
+                onRemove={onRemove}
+              ></Dashboard>
+            }
+          />
+          <Route path="/city/:name" element={<CityDetailsPage unit={unit} />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 
